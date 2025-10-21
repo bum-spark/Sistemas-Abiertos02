@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { NavbarComponent } from './gifs/pages/navbar/navbar.component';
 
 
 export const routes: Routes = [
@@ -8,16 +7,17 @@ export const routes: Routes = [
         loadComponent: () => import('./gifs/pages/dashboard-page/dashboard-page.component'),
         children: [
             {
-                path:'search',
+                path:'search/:term', 
                 loadComponent: () => import('./gifs/pages/search-page/search-page.component')
             },
+            
             {
                 path: 'trending',
                 loadComponent: () => import('./gifs/pages/trending-page/trending-page.component')
             },
             {
                 path: '**',
-                redirectTo: 'search'
+                redirectTo: 'trending'
             }
             
         ]

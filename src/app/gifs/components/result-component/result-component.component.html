@@ -1,0 +1,234 @@
+<!-- Contenedor principal de resultados -->
+<section class="w-full min-h-[400px]">
+  
+  @if (isLoading) {
+    <div class="flex flex-col items-center justify-center py-16 sm:py-24">
+      <!-- Spinner animado -->
+      <div
+        class="relative w-16 h-16 sm:w-20 sm:h-20 mb-6"
+        role="status"
+        aria-label="Cargando GIFs"
+      >
+        <div
+          class="absolute inset-0 border-4 border-blue-200 rounded-full animate-ping"
+        ></div>
+        <div
+          class="absolute inset-0 border-4 border-t-blue-600 border-r-blue-600 
+                 border-b-transparent border-l-transparent rounded-full animate-spin"
+        ></div>
+      </div>
+
+      <p class="text-base sm:text-lg font-medium text-gray-600 animate-pulse">
+        Cargando GIFs<span class="inline-block animate-bounce">.</span
+        ><span class="inline-block animate-bounce delay-100">.</span
+        ><span class="inline-block animate-bounce delay-200">.</span>
+      </p>
+
+      @if (searchTerm) {
+        <p class="text-sm text-gray-500 mt-2">
+          Buscando: <span class="font-semibold">{{ searchTerm }}</span>
+        </p>
+      }
+    </div>
+  }
+
+  <!-- Estado: Error -->
+  @else if (error) {
+    <div
+      class="flex flex-col items-center justify-center py-16 sm:py-24 px-4"
+    >
+      <div
+        class="w-16 h-16 sm:w-20 sm:h-20 mb-6 rounded-full bg-red-100 
+               flex items-center justify-center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="w-10 h-10 sm:w-12 sm:h-12 text-red-600"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+
+      <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2 text-center">
+        ¡Oops! Algo salió mal
+      </h3>
+      <p class="text-sm sm:text-base text-gray-600 text-center max-w-md">
+        {{ error }}
+      </p>
+    </div>
+  }
+
+  <!-- Estado: Sin resultados -->
+  @else if (!hasGifs) {
+    <div
+      class="flex flex-col items-center justify-center py-16 sm:py-24 px-4"
+    >
+      <div
+        class="w-16 h-16 sm:w-20 sm:h-20 mb-6 rounded-full bg-gray-100 
+               flex items-center justify-center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="w-10 h-10 sm:w-12 sm:h-12 text-gray-400"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+
+      <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2 text-center">
+        {{ noResultsMessage }}
+      </h3>
+      <p class="text-sm sm:text-base text-gray-600 text-center max-w-md">
+        Intenta con otros términos de búsqueda o explora los GIFs en tendencia
+      </p>
+    </div>
+  }
+
+  <!-- Estado: Resultados (de GIFs) -->
+  @else {
+    <div class="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <p class="text-sm sm:text-base text-gray-600">
+        <span class="font-semibold text-gray-800">{{ gifs.length }}</span>
+        {{ gifs.length === 1 ? 'resultado encontrado' : 'resultados encontrados' }}
+        @if (searchTerm) {
+          para <span class="font-semibold text-blue-600">"{{ searchTerm }}"</span>
+        }
+      </p>
+      
+      <!-- Información de rango actual -->
+      @if (hasPagination()) {
+        <p class="text-xs sm:text-sm text-gray-500">
+          Mostrando 
+          <span class="font-semibold">{{ currentRange().start }}</span> - 
+          <span class="font-semibold">{{ currentRange().end }}</span> 
+          de 
+          <span class="font-semibold">{{ currentRange().total }}</span>
+        </p>
+      }
+    </div>
+
+    <!-- tarjetas de GIFs -->
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5
+             gap-4 sm:gap-5 md:gap-6"
+    >
+      @for (gif of paginatedGifs(); track trackByGifId($index, gif)) {
+        <gif-card-component [gif]="gif"></gif-card-component>
+      }
+    </div>
+
+    <!-- Paginador - Solo se muestra si hay más de una página -->
+    @if (hasPagination()) {
+      <div class="mt-8 sm:mt-12">
+        <nav 
+          class="flex flex-col sm:flex-row items-center justify-between gap-4 
+                 border-t border-gray-200 pt-6"
+          aria-label="Paginación"
+        >
+          <!-- Botones de navegación (Anterior) -->
+          <div class="flex items-center gap-2">
+            <button
+              (click)="firstPage()"
+              [disabled]="isFirstPage"
+              [class.opacity-50]="isFirstPage"
+              [class.cursor-not-allowed]="isFirstPage"
+              class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 
+                     rounded-lg hover:bg-gray-50 disabled:hover:bg-white transition-colors
+                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+              title="Primera página"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                <path fill-rule="evenodd" d="M13.28 3.97a.75.75 0 010 1.06L6.31 12l6.97 6.97a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0zm6 0a.75.75 0 010 1.06L12.31 12l6.97 6.97a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z" clip-rule="evenodd" />
+              </svg>
+            </button>
+
+            <button
+              (click)="previousPage()"
+              [disabled]="isFirstPage"
+              [class.opacity-50]="isFirstPage"
+              [class.cursor-not-allowed]="isFirstPage"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 
+                     rounded-lg hover:bg-gray-50 disabled:hover:bg-white transition-colors
+                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Anterior
+            </button>
+          </div>
+
+          <!-- Números de página -->
+          <div class="flex items-center gap-1 sm:gap-2">
+            @for (pageNum of pageNumbers(); track $index) {
+              @if (pageNum === -1) {
+                <span class="px-2 text-gray-400">...</span>
+              } @else {
+                <button
+                  (click)="goToPage(pageNum)"
+                  [class.bg-blue-600]="currentPage() === pageNum"
+                  [class.text-white]="currentPage() === pageNum"
+                  [class.hover:bg-blue-700]="currentPage() === pageNum"
+                  [class.bg-white]="currentPage() !== pageNum"
+                  [class.text-gray-700]="currentPage() !== pageNum"
+                  [class.hover:bg-gray-50]="currentPage() !== pageNum"
+                  class="min-w-[40px] h-10 px-3 text-sm font-medium border border-gray-300 
+                         rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [attr.aria-current]="currentPage() === pageNum ? 'page' : null"
+                >
+                  {{ pageNum }}
+                </button>
+              }
+            }
+          </div>
+
+          <!-- Botones de navegación (Siguiente) -->
+          <div class="flex items-center gap-2">
+            <button
+              (click)="nextPage()"
+              [disabled]="isLastPage"
+              [class.opacity-50]="isLastPage"
+              [class.cursor-not-allowed]="isLastPage"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 
+                     rounded-lg hover:bg-gray-50 disabled:hover:bg-white transition-colors
+                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Siguiente
+            </button>
+
+            <button
+              (click)="lastPage()"
+              [disabled]="isLastPage"
+              [class.opacity-50]="isLastPage"
+              [class.cursor-not-allowed]="isLastPage"
+              class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 
+                     rounded-lg hover:bg-gray-50 disabled:hover:bg-white transition-colors
+                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+              title="Última página"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                <path fill-rule="evenodd" d="M10.72 3.97a.75.75 0 011.06 0l7.5 7.5a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 11-1.06-1.06L17.69 12l-6.97-6.97a.75.75 0 010-1.06zm-6 0a.75.75 0 011.06 0l7.5 7.5a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 11-1.06-1.06L11.69 12 4.72 5.03a.75.75 0 010-1.06z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </nav>
+
+        <div class="mt-4 text-center sm:hidden">
+          <p class="text-xs text-gray-500">
+            Página <span class="font-semibold">{{ currentPage() }}</span> de 
+            <span class="font-semibold">{{ totalPages() }}</span>
+          </p>
+        </div>
+      </div>
+    }
+  }
+</section>

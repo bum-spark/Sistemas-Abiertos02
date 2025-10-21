@@ -1,1 +1,90 @@
-<p>search-page works!</p>
+<div class="container mx-auto px-4 py-6 sm:py-8 lg:py-10">
+  
+  <header class="mb-8 sm:mb-10 lg:mb-12">
+    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4">
+      @if (api.currentSearchTerm() && api.currentSearchTerm() !== 'trending') {
+        <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+          Resultados para: "{{ api.currentSearchTerm() }}"
+        </span>
+      } @else {
+        <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+          Busca Gifs :)
+        </span>
+      }
+    </h1>
+    
+    <p class="text-gray-400 text-sm sm:text-base lg:text-lg max-w-3xl">
+      @if (api.currentSearchTerm() && api.currentSearchTerm() !== 'trending') {
+        Explora los mejores GIFs para tu búsqueda. Usa la paginación para ver más resultados.
+      } @else {
+        Descubre GIFs increíbles. 
+      }
+    </p>
+
+    @if (api.hasHistory()) {
+      <div class="mt-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">
+            Búsquedas recientes
+          </h3>
+          <button
+            (click)="clearHistory()"
+            class="text-xs text-red-400 hover:text-red-300 transition-colors duration-200 hover:underline focus:outline-none focus:ring-2 focus:ring-red-500 rounded px-2 py-1"
+          >
+            Limpiar todo
+          </button>
+        </div>
+        
+        <!-- Pastillas del historial -->
+        <div class="flex flex-wrap gap-2">
+          @for (term of api.searchHistory(); track term) {
+            <button
+              (click)="searchFromHistory(term)"
+              class="group relative inline-flex items-center gap-2 px-4 py-2 
+                     bg-slate-800/50 hover:bg-slate-700 
+                     text-slate-300 hover:text-white
+                     rounded-full text-sm font-medium
+                     border border-slate-700 hover:border-blue-500
+                     transition-all duration-200
+                     hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20
+                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <!-- Clock icon -->
+              <svg class="w-4 h-4 text-slate-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              
+              <span>{{ term }}</span>
+              
+              <!-- Remove button (aparece on hover) -->
+              <button
+                (click)="removeFromHistory($event, term)"
+                class="absolute -top-1 -right-1 
+                       w-5 h-5 flex items-center justify-center
+                       bg-red-500 hover:bg-red-600 
+                       text-white rounded-full
+                       opacity-0 group-hover:opacity-100
+                       transition-all duration-200
+                       focus:outline-none focus:ring-2 focus:ring-red-500"
+                title="Eliminar"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </header>
+
+  <result-component
+    [gifs]="api.gifs()"
+    [isLoading]="api.isLoading()"
+    [error]="api.error()"
+    [searchTerm]="api.currentSearchTerm()"
+    [pageSize]="15"
+  />
+
+</div>

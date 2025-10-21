@@ -1,10 +1,14 @@
-<a [routerLink]="router" routerLinkActive="router-link-active bg-blue-800" [routerLinkActiveOptions]="{ exact: true }"
-   class="w-full px-2 inline-flex space-x-2 items-center border-b border-slate-700 py-3 hover:bg-white/5 transition ease-linear duration-150">
-  <div>
-    <i [class]="icon"></i>
+<a [routerLink]="router" 
+   routerLinkActive="bg-blue-800" 
+   [routerLinkActiveOptions]="{ exact: false }"
+   class="w-full px-2 inline-flex space-x-2 items-center border-b border-slate-700 
+          py-3 sm:py-4 hover:bg-white/5 transition-all ease-linear duration-150
+          ">
+  <div class="flex-shrink-0">
+    <i [class]="icon" class="text-lg sm:text-xl"></i>
   </div>
-  <div class="flex flex-col">
-    <span class="text-lg font-bold leading-5 text-white">{{ title }}</span>
-    <span class="text-sm text-white/50 hidden md:block">{{ subtitle }}</span>
+  <div class="flex flex-col flex-1 min-w-0">
+    <span class="text-base sm:text-lg font-bold leading-5 text-white truncate">{{ title }}</span>
+    <span class="text-xs sm:text-sm text-white/50 hidden md:block truncate">{{ subtitle }}</span>
   </div>
 </a>
