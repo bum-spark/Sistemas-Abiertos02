@@ -1,3 +1,4 @@
+import { environment } from './../../../environments/environment';
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError, map, tap, of } from 'rxjs';
@@ -6,15 +7,17 @@ import { LocalStorageService } from './localStorage.service';
 import { SearchParams, TrendingParams } from '../interfaces/search.interface';
 import { Gif, GiphyResponse } from '../interfaces/giphy-response.interface';
 
+
 @Injectable({
   providedIn: 'root'
 })
 export class ApiGiphyService {
+  env = environment;
   private readonly http = inject(HttpClient);
   private readonly localStorageService = inject(LocalStorageService);
 
-  private readonly API_KEY = 'GIrYAj6G2i0aC5HRnFYMa9aOy3BKTZMU';
-  private readonly BASE_URL = 'https://api.giphy.com/v1/gifs';
+  private readonly API_KEY = this.env.apiKey;
+  private readonly BASE_URL = this.env.giphyUrl;
 
   private readonly ENDPOINTS = {
     search: `${this.BASE_URL}/search`,

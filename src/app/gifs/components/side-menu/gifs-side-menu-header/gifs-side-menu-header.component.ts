@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiGiphyService } from '../../../services/apiGiphy.service';
+//import { environment } from '../../../../../environments/environment';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'gifs-side-menu-header',
@@ -25,4 +27,6 @@ export default class GifsSideMenuHeaderComponent {
   onClearHistory(): void {
     this.api.clearHistory();
   }
+
+  envs = environment;
 }

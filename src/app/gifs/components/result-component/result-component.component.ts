@@ -21,7 +21,7 @@ export class ResultComponentComponent implements OnChanges {
 
   @Input() searchTerm: string = '';
 
-  @Input() pageSize: number = 15;
+  @Input() pageSize: number = 16;
 
   private _currentPage = signal<number>(1);
   public readonly currentPage = this._currentPage.asReadonly();
@@ -68,6 +68,30 @@ export class ResultComponentComponent implements OnChanges {
   public readonly hasPagination = computed(() => {
     return this.totalPages() > 1;
   });
+
+  public readonly masonryColumns = computed(() => {
+    const gifs = this.paginatedGifs();
+    const columnCount = 4;
+    const columns: Gif[][] = Array.from({ length: columnCount }, () => []);
+    const columnHeights: number[] = Array.from({ length: columnCount }, () => 0);
+    
+    gifs.forEach((gif) => {
+      const aspectRatio = gif.images?.fixed_width?.height && gif.images?.fixed_width?.width 
+        ? parseInt(gif.images.fixed_width.height) / parseInt(gif.images.fixed_width.width)
+        : 1; 
+      
+      const estimatedHeight = Math.min(250 * aspectRatio, 320);
+      
+      const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
+      
+      columns[shortestColumnIndex].push(gif);
+      columnHeights[shortestColumnIndex] += estimatedHeight + 16;
+    });
+    
+    return columns;
+  });
+
+
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this._currentPage.set(page);

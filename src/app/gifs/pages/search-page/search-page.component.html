@@ -49,14 +49,12 @@
                      hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20
                      focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <!-- Clock icon -->
               <svg class="w-4 h-4 text-slate-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               
               <span>{{ term }}</span>
               
-              <!-- Remove button (aparece on hover) -->
               <button
                 (click)="removeFromHistory($event, term)"
                 class="absolute -top-1 -right-1 
@@ -84,7 +82,7 @@
     [isLoading]="api.isLoading()"
     [error]="api.error()"
     [searchTerm]="api.currentSearchTerm()"
-    [pageSize]="15"
+    [pageSize]="16"
   />
 
 </div>
